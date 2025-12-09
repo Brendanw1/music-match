@@ -7,11 +7,19 @@ from typing import Optional
 
 @dataclass
 class Song:
-    """Song model with audio features."""
+    """Song model with audio features and Spotify metadata."""
     id: Optional[int] = None
+    spotify_id: Optional[str] = None
     title: str = ""
     artist: str = ""
+    album: str = ""
     file_path: str = ""
+    image_url: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    preview_url: Optional[str] = None
+    external_url: Optional[str] = None
+    duration_ms: int = 0
+    popularity: int = 0
     bpm: float = 0.0
     key: str = ""
     scale: str = ""
@@ -21,6 +29,8 @@ class Song:
     valence: float = 0.0
     instrumentalness: float = 0.0
     loudness: float = 0.0
+    speechiness: float = 0.0
+    liveness: float = 0.0
     cluster_id: Optional[int] = None
     created_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -28,9 +38,17 @@ class Song:
         """Convert song to dictionary."""
         return {
             "id": self.id,
+            "spotify_id": self.spotify_id,
             "title": self.title,
             "artist": self.artist,
+            "album": self.album,
             "file_path": self.file_path,
+            "image_url": self.image_url,
+            "thumbnail_url": self.thumbnail_url,
+            "preview_url": self.preview_url,
+            "external_url": self.external_url,
+            "duration_ms": self.duration_ms,
+            "popularity": self.popularity,
             "bpm": self.bpm,
             "key": self.key,
             "scale": self.scale,
@@ -40,6 +58,8 @@ class Song:
             "valence": self.valence,
             "instrumentalness": self.instrumentalness,
             "loudness": self.loudness,
+            "speechiness": self.speechiness,
+            "liveness": self.liveness,
             "cluster_id": self.cluster_id,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
@@ -111,3 +131,22 @@ class UserProfile:
             "matched_cluster_id": self.matched_cluster_id,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
+
+
+@dataclass
+class SpotifyCache:
+    """Cache for Spotify audio features to reduce API calls."""
+    id: Optional[int] = None
+    spotify_id: str = ""
+    features_json: str = "{}"
+    cached_at: datetime = field(default_factory=datetime.utcnow)
+
+    @property
+    def features(self) -> dict:
+        """Parse features JSON."""
+        return json.loads(self.features_json)
+
+    @features.setter
+    def features(self, value: dict):
+        """Set features from dict."""
+        self.features_json = json.dumps(value)
