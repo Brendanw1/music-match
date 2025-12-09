@@ -187,12 +187,12 @@ async def get_recommendations(
     # Get sample songs for matched cluster
     matched_sample = await get_songs_by_cluster(matched_cluster_id, limit=5)
 
+    matched_cluster_data = matched_cluster.to_dict() if matched_cluster else {}
+    matched_cluster_data["distance"] = round(distance, 3)
+    matched_cluster_data["sample_songs"] = [s.to_dict() for s in matched_sample]
+
     return {
-        "matched_cluster": {
-            **matched_cluster.to_dict() if matched_cluster else {},
-            "distance": round(distance, 3),
-            "sample_songs": [s.to_dict() for s in matched_sample]
-        },
+        "matched_cluster": matched_cluster_data,
         "songs": ranked_songs,
         "adjacent_clusters": adjacent_clusters
     }

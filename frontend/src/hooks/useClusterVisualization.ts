@@ -34,6 +34,7 @@ export function useClusterVisualization(autoLoad = false) {
 
   useEffect(() => {
     if (autoLoad) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       load();
     }
   }, [autoLoad, load]);

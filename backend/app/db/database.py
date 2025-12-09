@@ -11,17 +11,16 @@ from .models import Song, Cluster, UserProfile
 DATABASE_PATH = Path(__file__).parent.parent.parent / "data" / "music_match.db"
 
 
-async def get_db_connection() -> aiosqlite.Connection:
-    """Get database connection."""
+def _get_db_path() -> Path:
+    """Get database path and ensure directory exists."""
     DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = await aiosqlite.connect(DATABASE_PATH)
-    conn.row_factory = aiosqlite.Row
-    return conn
+    return DATABASE_PATH
 
 
 async def init_db():
     """Initialize database tables."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         # Create songs table
         await db.execute("""
             CREATE TABLE IF NOT EXISTS songs (
@@ -70,7 +69,8 @@ async def init_db():
 
 async def get_all_songs() -> list[Song]:
     """Get all songs from database."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         cursor = await db.execute("SELECT * FROM songs ORDER BY title")
         rows = await cursor.fetchall()
         return [_row_to_song(row) for row in rows]
@@ -78,7 +78,8 @@ async def get_all_songs() -> list[Song]:
 
 async def get_songs_by_cluster(cluster_id: int, limit: Optional[int] = None) -> list[Song]:
     """Get songs belonging to a cluster."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         query = "SELECT * FROM songs WHERE cluster_id = ? ORDER BY title"
         if limit:
             query += f" LIMIT {limit}"
@@ -89,7 +90,8 @@ async def get_songs_by_cluster(cluster_id: int, limit: Optional[int] = None) -> 
 
 async def get_song_by_id(song_id: int) -> Optional[Song]:
     """Get a single song by ID."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         cursor = await db.execute("SELECT * FROM songs WHERE id = ?", (song_id,))
         row = await cursor.fetchone()
         return _row_to_song(row) if row else None
@@ -97,7 +99,8 @@ async def get_song_by_id(song_id: int) -> Optional[Song]:
 
 async def save_song_features(song: Song) -> int:
     """Save or update song with features."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         if song.id:
             await db.execute("""
                 UPDATE songs SET
@@ -129,7 +132,8 @@ async def save_song_features(song: Song) -> int:
 
 async def get_all_clusters() -> list[Cluster]:
     """Get all clusters."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         cursor = await db.execute("SELECT * FROM clusters ORDER BY id")
         rows = await cursor.fetchall()
         return [_row_to_cluster(row) for row in rows]
@@ -137,7 +141,8 @@ async def get_all_clusters() -> list[Cluster]:
 
 async def get_cluster_by_id(cluster_id: int) -> Optional[Cluster]:
     """Get a single cluster by ID."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         cursor = await db.execute("SELECT * FROM clusters WHERE id = ?", (cluster_id,))
         row = await cursor.fetchone()
         return _row_to_cluster(row) if row else None
@@ -145,7 +150,8 @@ async def get_cluster_by_id(cluster_id: int) -> Optional[Cluster]:
 
 async def save_cluster(cluster: Cluster) -> int:
     """Save or update cluster."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         if cluster.id:
             await db.execute("""
                 UPDATE clusters SET centroid_json = ?, description = ?, song_count = ?
@@ -164,7 +170,7 @@ async def save_cluster(cluster: Cluster) -> int:
 
 async def clear_clusters():
     """Clear all clusters and reset song cluster assignments."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
         await db.execute("DELETE FROM clusters")
         await db.execute("UPDATE songs SET cluster_id = NULL")
         await db.commit()
@@ -172,7 +178,7 @@ async def clear_clusters():
 
 async def update_song_cluster(song_id: int, cluster_id: int):
     """Update song's cluster assignment."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
         await db.execute(
             "UPDATE songs SET cluster_id = ? WHERE id = ?",
             (cluster_id, song_id)
@@ -182,7 +188,7 @@ async def update_song_cluster(song_id: int, cluster_id: int):
 
 async def save_user_profile(profile: UserProfile) -> int:
     """Save user profile."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
         cursor = await db.execute("""
             INSERT INTO user_profiles (feature_vector_json, matched_cluster_id)
             VALUES (?, ?)
@@ -193,7 +199,8 @@ async def save_user_profile(profile: UserProfile) -> int:
 
 async def get_user_profile(profile_id: int) -> Optional[UserProfile]:
     """Get user profile by ID."""
-    async with await get_db_connection() as db:
+    async with aiosqlite.connect(_get_db_path()) as db:
+        db.row_factory = aiosqlite.Row
         cursor = await db.execute(
             "SELECT * FROM user_profiles WHERE id = ?",
             (profile_id,)

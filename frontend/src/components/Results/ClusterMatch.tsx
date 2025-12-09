@@ -1,5 +1,5 @@
 // Matched cluster display card
-import type { Cluster, Song } from '../../types';
+import type { Cluster } from '../../types';
 import { Card, Badge } from '../ui';
 import SongCard from '../Recommendations/SongCard';
 

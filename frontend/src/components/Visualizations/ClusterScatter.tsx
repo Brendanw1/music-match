@@ -34,7 +34,6 @@ interface ClusterScatterProps {
 export default function ClusterScatter({ onSongClick }: ClusterScatterProps) {
   const [data, setData] = useState<ClusterVisualization | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hoveredPoint, setHoveredPoint] = useState<VisualizationPoint | null>(null);
 
   useEffect(() => {
     loadVisualization();

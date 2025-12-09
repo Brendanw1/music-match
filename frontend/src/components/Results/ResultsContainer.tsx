@@ -1,37 +1,31 @@
 // Results page orchestrator
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import type { QuizResult } from '../../types';
-import { Button, Card, Loading } from '../ui';
+import { Button, Card } from '../ui';
 import ProfileRadar from './ProfileRadar';
 import ClusterMatch from './ClusterMatch';
 import AdjacentClusters from './AdjacentClusters';
 import { RecommendationGrid } from '../Recommendations';
 
+function getStoredResult(): QuizResult | null {
+  const stored = sessionStorage.getItem('quizResult');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 export default function ResultsContainer() {
   const navigate = useNavigate();
-  const [result, setResult] = useState<QuizResult | null>(null);
-
-  useEffect(() => {
-    // Load result from session storage
-    const stored = sessionStorage.getItem('quizResult');
-    if (stored) {
-      try {
-        setResult(JSON.parse(stored));
-      } catch {
-        navigate('/');
-      }
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
+  const result = useMemo(() => getStoredResult(), []);
 
   if (!result) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading size="lg" text="Loading results..." />
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   return (

@@ -1,7 +1,7 @@
 // Quiz state management and navigation
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { QuizQuestion, QuizAnswer, QuizResult } from '../../types';
+import type { QuizQuestion, QuizAnswer } from '../../types';
 import { quizApi } from '../../api/client';
 import { Button, Loading, ProgressBar } from '../ui';
 import QuestionCard from './QuestionCard';

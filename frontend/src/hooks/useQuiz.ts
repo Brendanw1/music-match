@@ -29,7 +29,7 @@ export function useQuiz() {
     try {
       const questions = await quizApi.getQuestions();
       setState((prev) => ({ ...prev, questions, loading: false }));
-    } catch (err) {
+    } catch {
       setState((prev) => ({
         ...prev,
         loading: false,

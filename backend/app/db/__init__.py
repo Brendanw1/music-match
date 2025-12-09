@@ -2,7 +2,6 @@
 from .models import Song, Cluster, UserProfile
 from .database import (
     init_db,
-    get_db_connection,
     get_all_songs,
     get_songs_by_cluster,
     get_song_by_id,
@@ -21,7 +20,6 @@ __all__ = [
     "Cluster",
     "UserProfile",
     "init_db",
-    "get_db_connection",
     "get_all_songs",
     "get_songs_by_cluster",
     "get_song_by_id",
