@@ -21,7 +21,7 @@ export function useApi<T>() {
       setState({ data: response.data, loading: false, error: null });
       return response.data;
     } catch (err) {
-      const error = err as AxiosError;
+      const error = err as AxiosError<{ message?: string }>;
       const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
       setState({ data: null, loading: false, error: errorMessage });
       throw error;
