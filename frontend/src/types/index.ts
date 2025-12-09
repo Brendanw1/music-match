@@ -39,8 +39,16 @@ export interface Cluster {
 
 export interface Song {
   id: number;
+  spotify_id?: string;
   title: string;
   artist: string;
+  album?: string;
+  image_url?: string;
+  thumbnail_url?: string;
+  preview_url?: string;
+  external_url?: string;
+  duration_ms?: number;
+  popularity?: number;
   bpm: number;
   key?: string;
   scale?: string;
@@ -50,8 +58,74 @@ export interface Song {
   valence: number;
   instrumentalness: number;
   loudness: number;
+  speechiness?: number;
+  liveness?: number;
   cluster_id: number;
   similarity_score?: number;
+}
+
+// Spotify-specific types
+export interface SpotifyTrack {
+  id: string;
+  name: string;
+  artists: string[];
+  album: string;
+  image_url?: string;
+  thumbnail_url?: string;
+  preview_url?: string;
+  external_url?: string;
+  duration_ms: number;
+  popularity: number;
+}
+
+export interface SpotifyAudioFeatures {
+  danceability: number;
+  energy: number;
+  key: number;
+  loudness: number;
+  mode: number;
+  speechiness: number;
+  acousticness: number;
+  instrumentalness: number;
+  liveness: number;
+  valence: number;
+  tempo: number;
+  duration_ms: number;
+  time_signature: number;
+}
+
+export interface NormalizedFeatures {
+  bpm_normalized: number;
+  energy: number;
+  danceability: number;
+  acousticness: number;
+  valence: number;
+  instrumentalness: number;
+  loudness: number;
+  speechiness: number;
+  liveness: number;
+  key: string;
+  scale: string;
+}
+
+export interface SpotifySearchResult {
+  tracks: SpotifyTrack[];
+  query: string;
+  limit: number;
+  offset: number;
+}
+
+export interface SpotifyTrackFeatures {
+  track_id: string;
+  features: SpotifyAudioFeatures;
+  normalized: NormalizedFeatures;
+  cached: boolean;
+}
+
+export interface SpotifyRecommendationsResult {
+  recommendations: SpotifyTrack[];
+  seed_tracks: string[];
+  limit: number;
 }
 
 export interface QuizResult {

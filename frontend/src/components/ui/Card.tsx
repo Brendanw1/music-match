@@ -4,6 +4,9 @@ interface CardProps {
   className?: string;
   variant?: 'default' | 'interactive' | 'highlighted';
   onClick?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  role?: string;
+  tabIndex?: number;
 }
 
 export default function Card({
@@ -11,6 +14,9 @@ export default function Card({
   className = '',
   variant = 'default',
   onClick,
+  onKeyDown,
+  role,
+  tabIndex,
 }: CardProps) {
   const baseClasses = 'rounded-xl backdrop-blur-sm';
 
@@ -24,8 +30,9 @@ export default function Card({
     <div
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
       onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onKeyDown}
+      role={role ?? (onClick ? 'button' : undefined)}
+      tabIndex={tabIndex ?? (onClick ? 0 : undefined)}
     >
       {children}
     </div>

@@ -7,6 +7,10 @@ import type {
   Cluster,
   Song,
   ClusterVisualization,
+  SpotifyTrack,
+  SpotifySearchResult,
+  SpotifyTrackFeatures,
+  SpotifyRecommendationsResult,
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -77,6 +81,95 @@ export const clustersApi = {
 export const songsApi = {
   getById: async (songId: number): Promise<Song> => {
     const response = await api.get<Song>(`/songs/${songId}`);
+    return response.data;
+  },
+};
+
+// Spotify API
+export const spotifyApi = {
+  search: async (
+    query: string,
+    limit = 20,
+    offset = 0
+  ): Promise<SpotifySearchResult> => {
+    const response = await api.get<SpotifySearchResult>('/spotify/search', {
+      params: { q: query, limit, offset },
+    });
+    return response.data;
+  },
+
+  getTrack: async (trackId: string): Promise<SpotifyTrack> => {
+    const response = await api.get<SpotifyTrack>(`/spotify/track/${trackId}`);
+    return response.data;
+  },
+
+  getTrackFeatures: async (trackId: string): Promise<SpotifyTrackFeatures> => {
+    const response = await api.get<SpotifyTrackFeatures>(
+      `/spotify/track/${trackId}/features`
+    );
+    return response.data;
+  },
+
+  getTrackFull: async (
+    trackId: string
+  ): Promise<{ track: Song; source: string }> => {
+    const response = await api.get<{ track: Song; source: string }>(
+      `/spotify/track/${trackId}/full`
+    );
+    return response.data;
+  },
+
+  getRecommendations: async (
+    seedTracks: string[],
+    limit = 20,
+    targetFeatures?: {
+      energy?: number;
+      danceability?: number;
+      valence?: number;
+      acousticness?: number;
+      instrumentalness?: number;
+    }
+  ): Promise<SpotifyRecommendationsResult> => {
+    const params: Record<string, string | number> = {
+      seed_tracks: seedTracks.join(','),
+      limit,
+    };
+
+    if (targetFeatures) {
+      if (targetFeatures.energy !== undefined) {
+        params.target_energy = targetFeatures.energy;
+      }
+      if (targetFeatures.danceability !== undefined) {
+        params.target_danceability = targetFeatures.danceability;
+      }
+      if (targetFeatures.valence !== undefined) {
+        params.target_valence = targetFeatures.valence;
+      }
+      if (targetFeatures.acousticness !== undefined) {
+        params.target_acousticness = targetFeatures.acousticness;
+      }
+      if (targetFeatures.instrumentalness !== undefined) {
+        params.target_instrumentalness = targetFeatures.instrumentalness;
+      }
+    }
+
+    const response = await api.get<SpotifyRecommendationsResult>(
+      '/spotify/recommendations',
+      { params }
+    );
+    return response.data;
+  },
+
+  importTrack: async (
+    trackId: string,
+    clusterId?: number
+  ): Promise<{ song: Song; imported: boolean; message: string }> => {
+    const params = clusterId !== undefined ? { cluster_id: clusterId } : {};
+    const response = await api.post<{
+      song: Song;
+      imported: boolean;
+      message: string;
+    }>(`/spotify/import/${trackId}`, null, { params });
     return response.data;
   },
 };

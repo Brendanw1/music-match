@@ -1,11 +1,13 @@
 """Database module."""
-from .models import Song, Cluster, UserProfile
+from .models import Song, Cluster, UserProfile, SpotifyCache
 from .database import (
     init_db,
     get_all_songs,
     get_songs_by_cluster,
     get_song_by_id,
+    get_song_by_spotify_id,
     save_song_features,
+    save_song,
     get_all_clusters,
     get_cluster_by_id,
     save_cluster,
@@ -13,17 +15,24 @@ from .database import (
     update_song_cluster,
     save_user_profile,
     get_user_profile,
+    get_cached_features,
+    get_cached_features_batch,
+    cache_features,
+    cache_features_batch,
 )
 
 __all__ = [
     "Song",
     "Cluster",
     "UserProfile",
+    "SpotifyCache",
     "init_db",
     "get_all_songs",
     "get_songs_by_cluster",
     "get_song_by_id",
+    "get_song_by_spotify_id",
     "save_song_features",
+    "save_song",
     "get_all_clusters",
     "get_cluster_by_id",
     "save_cluster",
@@ -31,4 +40,8 @@ __all__ = [
     "update_song_cluster",
     "save_user_profile",
     "get_user_profile",
+    "get_cached_features",
+    "get_cached_features_batch",
+    "cache_features",
+    "cache_features_batch",
 ]
