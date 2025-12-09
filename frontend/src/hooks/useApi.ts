@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 
 interface UseApiState<T> {
   data: T | null;
@@ -14,7 +14,7 @@ export function useApi<T>() {
     error: null,
   });
 
-  const execute = useCallback(async (url: string, options?: any) => {
+  const execute = useCallback(async (url: string, options?: AxiosRequestConfig) => {
     setState({ data: null, loading: true, error: null });
     try {
       const response = await axios(url, options);

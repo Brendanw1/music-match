@@ -15,7 +15,7 @@ export const healthCheck = () => api.get('/health');
 
 // Quiz endpoints
 export const getQuiz = () => api.get('/api/quiz');
-export const submitQuizAnswer = (answerId: string, answer: any) => 
+export const submitQuizAnswer = (answerId: string, answer: unknown) => 
   api.post(`/api/quiz/${answerId}`, answer);
 
 // Recommendations endpoints

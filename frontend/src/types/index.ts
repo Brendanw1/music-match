@@ -27,7 +27,7 @@ export interface QuizQuestion {
 export interface QuizOption {
   id: string;
   text: string;
-  value: any;
+  value: string | number | boolean;
 }
 
 export interface Recommendation {
