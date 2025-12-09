@@ -1,5 +1,13 @@
 // API client for Music Match backend
 import axios from 'axios';
+import type {
+  QuizQuestion,
+  QuizAnswer,
+  QuizResult,
+  Cluster,
+  Song,
+  ClusterVisualization,
+} from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -13,22 +21,62 @@ export const api = axios.create({
 // Health check
 export const healthCheck = () => api.get('/health');
 
-// Quiz endpoints
-export const getQuiz = () => api.get('/api/quiz');
-export const submitQuizAnswer = (answerId: string, answer: unknown) => 
-  api.post(`/api/quiz/${answerId}`, answer);
+// Quiz API
+export const quizApi = {
+  getQuestions: async (): Promise<QuizQuestion[]> => {
+    const response = await api.get<{ questions: QuizQuestion[] }>('/quiz/questions');
+    return response.data.questions;
+  },
 
-// Recommendations endpoints
-export const getRecommendations = (userId: string) => 
-  api.get(`/api/recommendations/${userId}`);
+  submitQuiz: async (answers: QuizAnswer[]): Promise<QuizResult> => {
+    const response = await api.post<QuizResult>('/quiz/submit', { answers });
+    return response.data;
+  },
+};
 
-// Features endpoints
-export const extractFeatures = (audioFile: File) => {
-  const formData = new FormData();
-  formData.append('audio', audioFile);
-  return api.post('/api/features/extract', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+// Recommendations API
+export const recommendationsApi = {
+  getByCluster: async (
+    clusterId: number,
+    limit?: number,
+    userVector?: Record<string, number>
+  ): Promise<Song[]> => {
+    const params: Record<string, string | number> = {};
+    if (limit) params.limit = limit;
+    if (userVector) params.user_vector = JSON.stringify(userVector);
+
+    const response = await api.get<{ songs: Song[] }>(
+      `/recommendations/${clusterId}`,
+      { params }
+    );
+    return response.data.songs;
+  },
+};
+
+// Clusters API
+export const clustersApi = {
+  getAll: async (): Promise<Cluster[]> => {
+    const response = await api.get<{ clusters: Cluster[] }>('/clusters');
+    return response.data.clusters;
+  },
+
+  getById: async (clusterId: number): Promise<Cluster & { songs: Song[] }> => {
+    const response = await api.get<Cluster & { songs: Song[] }>(
+      `/clusters/${clusterId}`
+    );
+    return response.data;
+  },
+
+  getVisualization: async (): Promise<ClusterVisualization> => {
+    const response = await api.get<ClusterVisualization>('/clusters/visualization');
+    return response.data;
+  },
+};
+
+// Songs API
+export const songsApi = {
+  getById: async (songId: number): Promise<Song> => {
+    const response = await api.get<Song>(`/songs/${songId}`);
+    return response.data;
+  },
 };
